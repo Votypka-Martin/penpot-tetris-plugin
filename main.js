@@ -5,16 +5,16 @@ penpot.ui.open("Tetris", "index.html", {
 
 penpot.ui.onMessage(async (message) => {
   if (message.type === "game-over") {
-    const { score, lines, boardImageDataUrl } = message;
+    const { score, lines } = message;
 
     const centerX = penpot.viewport.center.x;
     const centerY = penpot.viewport.center.y;
 
     const card = penpot.createRectangle();
-    card.name = "Tetris - Výsledková karta";
-    card.resize(300, 480);
+    card.name = "Výsledky";
+    card.resize(300, 260);
     card.x = centerX - 150;
-    card.y = centerY - 240;
+    card.y = centerY - 130;
     card.fills = [{ fillType: "solid", fillColor: "#1e1e2e", fillOpacity: 1 }];
     card.borderRadius = 12;
 
@@ -23,30 +23,17 @@ penpot.ui.onMessage(async (message) => {
       title.name = "Nadpis";
       title.fontSize = 22;
       title.x = centerX - 65;
-      title.y = centerY - 210;
+      title.y = centerY - 90;
       title.fills = [{ fillType: "solid", fillColor: "#f38ba8", fillOpacity: 1 }];
     }
 
     const scoreText = penpot.createText(`Skóre: ${score}   |   Řádky: ${lines}`);
     if (scoreText) {
-      scoreText.name = "Skóre";
+      scoreText.name = "Skóre a statistiky";
       scoreText.fontSize = 14;
       scoreText.x = centerX - 105;
-      scoreText.y = centerY - 170;
+      scoreText.y = centerY - 30;
       scoreText.fills = [{ fillType: "solid", fillColor: "#cdd6f4", fillOpacity: 1 }];
     }
-
-    const boardImg = penpot.createRectangle();
-    boardImg.name = "Konečné uspořádání kostek";
-    boardImg.resize(200, 320); boardImg.x = centerX - 100;
-    boardImg.y = centerY - 130;
-    boardImg.fills = [
-      {
-        fillType: "image",
-        fillOpacity: 1,
-        url: boardImageDataUrl
-      }
-    ];
-    boardImg.borderRadius = 6;
   }
 });
