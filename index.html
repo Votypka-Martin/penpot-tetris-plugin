@@ -80,14 +80,7 @@
 
         const SHAPES = [
             [],
-            [[1, 1, 1, 1]], // I
-            [[1, 1], [1, 1]], // O
-            [[0, 1, 0], [1, 1, 1]], // T
-            [[1, 0, 0], [1, 1, 1]], // L
-            [[0, 0, 1], [1, 1, 1]], // J
-            [[0, 1, 1], [1, 1, 0]], // S
-            [[1, 1, 0], [0, 1, 1]]  // Z
-        ];
+            [[1, 1, 1, 1]], [[1, 1], [1, 1]], [[0, 1, 0], [1, 1, 1]], [[1, 0, 0], [1, 1, 1]], [[0, 0, 1], [1, 1, 1]], [[0, 1, 1], [1, 1, 0]], [[1, 1, 0], [0, 1, 1]]  ];
 
         let board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
         let score = 0;
@@ -113,7 +106,6 @@
             ctx.fillStyle = '#11111b';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Kreslení hrací plochy
             board.forEach((row, y) => {
                 row.forEach((value, x) => {
                     if (value > 0) {
@@ -123,7 +115,6 @@
                 });
             });
 
-            // Kreslení aktivního dílku
             if (piece) {
                 piece.shape.forEach((row, y) => {
                     row.forEach((value, x) => {
@@ -210,12 +201,9 @@
             requestAnimationFrame(update);
         }
 
-        // Konec hry - Odeslání výsledků do Penpotu
         function onGameOver() {
-            draw(); // Finální vykreslení
-            const imgData = canvas.toDataURL('image/png');
+            draw(); const imgData = canvas.toDataURL('image/png');
 
-            // Poslání zprávy do main.js
             parent.postMessage({
                 type: 'game-over',
                 score: score,
@@ -224,7 +212,6 @@
             }, '*');
         }
 
-        // Zachytávání kláves
         window.addEventListener('keydown', e => {
             if (gameOver || !piece) return;
 
@@ -252,9 +239,12 @@
             scoreEl.innerText = 0;
             linesEl.innerText = 0;
             gameOver = false;
+            lastTime = performance.now();
             piece = createPiece();
             update();
         });
+
+        draw();
     </script>
 </body>
 </html>

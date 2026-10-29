@@ -12,32 +12,31 @@ penpot.ui.onMessage(async (message) => {
 
     const card = penpot.createRectangle();
     card.name = "Tetris - Výsledková karta";
-    card.resize(320, 520);
-    card.x = centerX - 160;
-    card.y = centerY - 260;
+    card.resize(300, 480);
+    card.x = centerX - 150;
+    card.y = centerY - 240;
     card.fills = [{ fillColor: "#1e1e2e", fillOpacity: 1 }];
     card.borderRadius = 12;
 
     const title = penpot.createText();
     title.name = "Nadpis";
     title.characters = "GAME OVER";
-    title.fontSize = 24;
-    title.fontId = "sans-serif";
-    title.x = centerX - 80;
-    title.y = centerY - 230;
+    title.fontSize = 20;
+    title.x = centerX - 60;
+    title.y = centerY - 210;
     title.fills = [{ fillColor: "#f38ba8", fillOpacity: 1 }];
 
     const scoreText = penpot.createText();
     scoreText.name = "Skóre";
-    scoreText.characters = `Skóre: ${score}\nŘádky: ${lines}`;
-    scoreText.fontSize = 16;
-    scoreText.x = centerX - 100;
-    scoreText.y = centerY - 190;
+    scoreText.characters = `Skóre: ${score}   |   Řádky: ${lines}`;
+    scoreText.fontSize = 14;
+    scoreText.x = centerX - 110;
+    scoreText.y = centerY - 170;
     scoreText.fills = [{ fillColor: "#cdd6f4", fillOpacity: 1 }];
 
     const boardImg = penpot.createRectangle();
     boardImg.name = "Konečné uspořádání kostek";
-    boardImg.resize(200, 320);     boardImg.x = centerX - 100;
+    boardImg.resize(200, 320); boardImg.x = centerX - 100;
     boardImg.y = centerY - 130;
     boardImg.fills = [
       {
