@@ -3,69 +3,97 @@ penpot.ui.open("Tetris", "index.html", {
   height: 560
 });
 
-const TETRIS_COLORS = [
-  null, 
-  '#f38ba8', '#fab387', '#f9e2af', '#a6e3a1', '#74c7ec', '#b4befe', '#cba6f7'  ];
-
 penpot.ui.onMessage(async (message) => {
   if (message.type === "game-over") {
-    const { score, lines, boardData } = message;
+    const { score, lines } = message;
 
+    // Střed aktuálního pohledu v Penpotu
     const centerX = penpot.viewport.center.x;
     const centerY = penpot.viewport.center.y;
 
+    const cardWidth = 320;
+    const cardHeight = 220;
+    const cardX = centerX - cardWidth / 2;
+    const cardY = centerY - cardHeight / 2;
+
+    // 1. Hlavní karta pozadí (Moderní tmavý "Catppuccin" styl s border-radius)
     const card = penpot.createRectangle();
     card.name = "Tetris - Výsledková karta";
-    card.resize(260, 430);
-    card.x = centerX - 130;
-    card.y = centerY - 215;
-    card.fills = [{ fillType: "solid", fillColor: "#1e1e2e", fillOpacity: 1 }];
-    card.borderRadius = 12;
+    card.resize(cardWidth, cardHeight);
+    card.x = cardX;
+    card.y = cardY;
+    card.fills = [{ fillType: "solid", fillColor: "#181825", fillOpacity: 1 }];
+    card.borderRadius = 16;
 
+    // 2. Horní štítek / Kategorie
+    const badge = penpot.createText("PENPOT ARCADE");
+    if (badge) {
+      badge.name = "Štítek";
+      badge.fontSize = 10;
+      badge.x = cardX + 24;
+      badge.y = cardY + 24;
+      badge.fills = [{ fillType: "solid", fillColor: "#a6adc8", fillOpacity: 1 }];
+    }
+
+    // 3. Hlavní nadpis "GAME OVER"
     const title = penpot.createText("GAME OVER");
     if (title) {
       title.name = "Nadpis";
-      title.fontSize = 20;
-      title.x = centerX - 58;
-      title.y = centerY - 190;
+      title.fontSize = 24;
+      title.x = cardX + 24;
+      title.y = cardY + 44;
+      // Tučný / výrazný červeno-růžový nádech
       title.fills = [{ fillType: "solid", fillColor: "#f38ba8", fillOpacity: 1 }];
     }
 
-    const scoreText = penpot.createText(`Skóre: ${score}   |   Řádky: ${lines}`);
-    if (scoreText) {
-      scoreText.name = "Skóre";
-      scoreText.fontSize = 12;
-      scoreText.x = centerX - 95;
-      scoreText.y = centerY - 155;
-      scoreText.fills = [{ fillType: "solid", fillColor: "#cdd6f4", fillOpacity: 1 }];
+    // 4. Podkladová kartička pro statistiky (Skóre)
+    const scoreBox = penpot.createRectangle();
+    scoreBox.name = "Box - Skóre";
+    scoreBox.resize(130, 70);
+    scoreBox.x = cardX + 24;
+    scoreBox.y = cardY + 110;
+    scoreBox.fills = [{ fillType: "solid", fillColor: "#313244", fillOpacity: 1 }];
+    scoreBox.borderRadius = 10;
+
+    const scoreLabel = penpot.createText("SKÓRE");
+    if (scoreLabel) {
+      scoreLabel.fontSize = 10;
+      scoreLabel.x = cardX + 38;
+      scoreLabel.y = cardY + 122;
+      scoreLabel.fills = [{ fillType: "solid", fillColor: "#a6adc8", fillOpacity: 1 }];
     }
 
-    const BLOCK_SIZE = 16; const startX = centerX - (10 * BLOCK_SIZE) / 2; const startY = centerY - 120; 
-    const boardBg = penpot.createRectangle();
-    boardBg.name = "Hrací plocha - pozadí";
-    boardBg.resize(10 * BLOCK_SIZE, 16 * BLOCK_SIZE);
-    boardBg.x = startX;
-    boardBg.y = startY;
-    boardBg.fills = [{ fillType: "solid", fillColor: "#11111b", fillOpacity: 1 }];
-    boardBg.borderRadius = 4;
+    const scoreValue = penpot.createText(`${score}`);
+    if (scoreValue) {
+      scoreValue.fontSize = 20;
+      scoreValue.x = cardX + 38;
+      scoreValue.y = cardY + 140;
+      scoreValue.fills = [{ fillType: "solid", fillColor: "#fab387", fillOpacity: 1 }]; // Oranžová pro skóre
+    }
 
-    if (boardData && Array.isArray(boardData)) {
-      boardData.forEach((row, y) => {
-        row.forEach((cellValue, x) => {
-          if (cellValue > 0) {
-            const block = penpot.createRectangle();
-            block.name = `Kostka [${x},${y}]`;
-            block.resize(BLOCK_SIZE - 1, BLOCK_SIZE - 1); block.x = startX + (x * BLOCK_SIZE);
-            block.y = startY + (y * BLOCK_SIZE);
-            block.fills = [{ 
-              fillType: "solid", 
-              fillColor: TETRIS_COLORS[cellValue] || '#ffffff', 
-              fillOpacity: 1 
-            }];
-            block.borderRadius = 2;
-          }
-        });
-      });
+    // 5. Podkladová kartička pro řádky
+    const linesBox = penpot.createRectangle();
+    linesBox.name = "Box - Řádky";
+    linesBox.resize(130, 70);
+    linesBox.x = cardX + 166;
+    linesBox.y = cardY + 110;
+    linesBox.fills = [{ fillType: "solid", fillColor: "#313244", fillOpacity: 1 }];
+    linesBox.borderRadius = 10;
+
+    const linesLabel = penpot.createText("DOKONČENÉ ŘÁDKY");
+    if (linesLabel) {
+      linesLabel.fontSize = 10;
+      linesLabel.x = cardX + 180;
+      linesLabel.y = cardY + 122;
+      linesLabel.fills = [{ fillType: "solid", fillColor: "#a6adc8", fillOpacity: 1 }];
+    }
+
+    const linesValue = penpot.createText(`${lines}`);
+    if (linesValue) {
+      linesValue.fontSize = 20;
+      linesValue.x = cardX + 180;
+      linesValue.y = cardY + 140;
+      linesValue.fills = [{ fillType: "solid", fillColor: "#a6e3a1", fillOpacity: 1 }]; // Zelená pro řádky
     }
   }
 });
