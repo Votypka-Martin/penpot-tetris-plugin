@@ -1,0 +1,10 @@
+{
+  "name": "Tetris Game & Result Generator",
+  "id": "tetris-penpot-plugin",
+  "version": "1.0.0",
+  "description": "Po skončení hry se vygeneruje výsledky na plátně Penpotu.",
+  "main": "main.js",
+  "permissions": [
+    "content:write"
+  ]
+}

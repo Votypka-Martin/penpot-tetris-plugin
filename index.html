@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background: #1e1e2e;
+            color: #cdd6f4;
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h2 { margin: 0 0 10px 0; font-size: 18px; color: #f38ba8; }
+        canvas {
+            background: #11111b;
+            border: 2px solid #45475a;
+            border-radius: 8px;
+            display: block;
+        }
+        .info {
+            display: flex;
+            justify-content: space-between;
+            width: 200px;
+            margin: 10px 0;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .controls {
+            font-size: 11px;
+            color: #a6adc8;
+            text-align: center;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        button {
+            margin-top: 10px;
+            background: #a6e3a1;
+            color: #11111b;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Penpot Tetris</h2>
+    <div class="info">
+        <span>Skóre: <span id="score">0</span></span>
+        <span>Řádky: <span id="lines">0</span></span>
+    </div>
+
+    <canvas id="tetris" width="200" height="320"></canvas>
+
+    <div class="controls">
+        <b>Ovládání:</b><br>
+        ← / → : Posun | ↑ : Rotace | ↓ : Padat
+    </div>
+
+    <button id="startBtn">Start / Restart</button>
+
+    <script>
+        const canvas = document.getElementById('tetris');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+        const linesEl = document.getElementById('lines');
+
+        const COLS = 10;
+        const ROWS = 16;
+        const BLOCK_SIZE = 20;
+
+        const COLORS = [
+            null, '#f38ba8', '#fab387', '#f9e2af', '#a6e3a1', '#74c7ec', '#b4befe', '#cba6f7'
+        ];
+
+        const SHAPES = [
+            [],
+            [[1, 1, 1, 1]], // I
+            [[1, 1], [1, 1]], // O
+            [[0, 1, 0], [1, 1, 1]], // T
+            [[1, 0, 0], [1, 1, 1]], // L
+            [[0, 0, 1], [1, 1, 1]], // J
+            [[0, 1, 1], [1, 1, 0]], // S
+            [[1, 1, 0], [0, 1, 1]]  // Z
+        ];
+
+        let board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+        let score = 0;
+        let lines = 0;
+        let gameOver = false;
+        let dropInterval = 600;
+        let lastTime = 0;
+        let dropCounter = 0;
+        let piece = null;
+
+        function createPiece() {
+            const id = Math.floor(Math.random() * 7) + 1;
+            const shape = SHAPES[id];
+            return {
+                shape: shape,
+                color: id,
+                x: Math.floor(COLS / 2) - Math.ceil(shape[0].length / 2),
+                y: 0
+            };
+        }
+
+        function draw() {
+            ctx.fillStyle = '#11111b';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Kreslení hrací plochy
+            board.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value > 0) {
+                        ctx.fillStyle = COLORS[value];
+                        ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
+                    }
+                });
+            });
+
+            // Kreslení aktivního dílku
+            if (piece) {
+                piece.shape.forEach((row, y) => {
+                    row.forEach((value, x) => {
+                        if (value) {
+                            ctx.fillStyle = COLORS[piece.color];
+                            ctx.fillRect((piece.x + x) * BLOCK_SIZE, (piece.y + y) * BLOCK_SIZE, BLOCK_SIZE - 1, BLOCK_SIZE - 1);
+                        }
+                    });
+                });
+            }
+        }
+
+        function collide(board, piece) {
+            for (let y = 0; y < piece.shape.length; y++) {
+                for (let x = 0; x < piece.shape[y].length; x++) {
+                    if (piece.shape[y][x] !== 0 &&
+                       (board[piece.y + y] && board[piece.y + y][piece.x + x]) !== 0) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function merge(board, piece) {
+            piece.shape.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value) {
+                        board[piece.y + y][piece.x + x] = piece.color;
+                    }
+                });
+            });
+        }
+
+        function rotate(matrix) {
+            return matrix[0].map((_, i) => matrix.map(row => row[i]).reverse());
+        }
+
+        function clearRows() {
+            let cleared = 0;
+            outer: for (let y = board.length - 1; y >= 0; y--) {
+                for (let x = 0; x < board[y].length; x++) {
+                    if (board[y][x] === 0) continue outer;
+                }
+                const row = board.splice(y, 1)[0].fill(0);
+                board.unshift(row);
+                y++;
+                cleared++;
+            }
+            if (cleared > 0) {
+                lines += cleared;
+                score += cleared * 100;
+                scoreEl.innerText = score;
+                linesEl.innerText = lines;
+            }
+        }
+
+        function playerDrop() {
+            piece.y++;
+            if (collide(board, piece)) {
+                piece.y--;
+                merge(board, piece);
+                clearRows();
+                piece = createPiece();
+                if (collide(board, piece)) {
+                    gameOver = true;
+                    onGameOver();
+                }
+            }
+            dropCounter = 0;
+        }
+
+        function update(time = 0) {
+            if (gameOver) return;
+            const deltaTime = time - lastTime;
+            lastTime = time;
+            dropCounter += deltaTime;
+
+            if (dropCounter > dropInterval) {
+                playerDrop();
+            }
+
+            draw();
+            requestAnimationFrame(update);
+        }
+
+        // Konec hry - Odeslání výsledků do Penpotu
+        function onGameOver() {
+            draw(); // Finální vykreslení
+            const imgData = canvas.toDataURL('image/png');
+
+            // Poslání zprávy do main.js
+            parent.postMessage({
+                type: 'game-over',
+                score: score,
+                lines: lines,
+                boardImageDataUrl: imgData
+            }, '*');
+        }
+
+        // Zachytávání kláves
+        window.addEventListener('keydown', e => {
+            if (gameOver || !piece) return;
+
+            if (e.key === 'ArrowLeft') {
+                piece.x--;
+                if (collide(board, piece)) piece.x++;
+            } else if (e.key === 'ArrowRight') {
+                piece.x++;
+                if (collide(board, piece)) piece.x--;
+            } else if (e.key === 'ArrowDown') {
+                playerDrop();
+            } else if (e.key === 'ArrowUp') {
+                const rotated = rotate(piece.shape);
+                const oldShape = piece.shape;
+                piece.shape = rotated;
+                if (collide(board, piece)) piece.shape = oldShape;
+            }
+            draw();
+        });
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+            score = 0;
+            lines = 0;
+            scoreEl.innerText = 0;
+            linesEl.innerText = 0;
+            gameOver = false;
+            piece = createPiece();
+            update();
+        });
+    </script>
+</body>
+</html>
