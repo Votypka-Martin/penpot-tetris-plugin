@@ -23,7 +23,7 @@ penpot.ui.onMessage(async (message) => {
     card.fills = [{ fillType: "solid", fillColor: "#181825", fillOpacity: 1 }];
     card.borderRadius = 16;
 
-    const badge = penpot.createText("PENPOT ARCADE");
+    const badge = penpot.createText("PENPOT TETRIS");
     if (badge) {
       badge.name = "Štítek";
       badge.fontSize = 10;
