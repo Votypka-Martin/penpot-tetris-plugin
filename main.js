@@ -7,7 +7,6 @@ penpot.ui.onMessage(async (message) => {
   if (message.type === "game-over") {
     const { score, lines } = message;
 
-    // Střed aktuálního pohledu v Penpotu
     const centerX = penpot.viewport.center.x;
     const centerY = penpot.viewport.center.y;
 
@@ -16,7 +15,6 @@ penpot.ui.onMessage(async (message) => {
     const cardX = centerX - cardWidth / 2;
     const cardY = centerY - cardHeight / 2;
 
-    // 1. Hlavní karta pozadí (Moderní tmavý "Catppuccin" styl s border-radius)
     const card = penpot.createRectangle();
     card.name = "Tetris - Výsledková karta";
     card.resize(cardWidth, cardHeight);
@@ -25,7 +23,6 @@ penpot.ui.onMessage(async (message) => {
     card.fills = [{ fillType: "solid", fillColor: "#181825", fillOpacity: 1 }];
     card.borderRadius = 16;
 
-    // 2. Horní štítek / Kategorie
     const badge = penpot.createText("PENPOT ARCADE");
     if (badge) {
       badge.name = "Štítek";
@@ -35,18 +32,15 @@ penpot.ui.onMessage(async (message) => {
       badge.fills = [{ fillType: "solid", fillColor: "#a6adc8", fillOpacity: 1 }];
     }
 
-    // 3. Hlavní nadpis "GAME OVER"
     const title = penpot.createText("GAME OVER");
     if (title) {
       title.name = "Nadpis";
       title.fontSize = 24;
       title.x = cardX + 24;
       title.y = cardY + 44;
-      // Tučný / výrazný červeno-růžový nádech
       title.fills = [{ fillType: "solid", fillColor: "#f38ba8", fillOpacity: 1 }];
     }
 
-    // 4. Podkladová kartička pro statistiky (Skóre)
     const scoreBox = penpot.createRectangle();
     scoreBox.name = "Box - Skóre";
     scoreBox.resize(130, 70);
@@ -68,10 +62,8 @@ penpot.ui.onMessage(async (message) => {
       scoreValue.fontSize = 20;
       scoreValue.x = cardX + 38;
       scoreValue.y = cardY + 140;
-      scoreValue.fills = [{ fillType: "solid", fillColor: "#fab387", fillOpacity: 1 }]; // Oranžová pro skóre
-    }
+      scoreValue.fills = [{ fillType: "solid", fillColor: "#fab387", fillOpacity: 1 }]; }
 
-    // 5. Podkladová kartička pro řádky
     const linesBox = penpot.createRectangle();
     linesBox.name = "Box - Řádky";
     linesBox.resize(130, 70);
@@ -93,7 +85,6 @@ penpot.ui.onMessage(async (message) => {
       linesValue.fontSize = 20;
       linesValue.x = cardX + 180;
       linesValue.y = cardY + 140;
-      linesValue.fills = [{ fillType: "solid", fillColor: "#a6e3a1", fillOpacity: 1 }]; // Zelená pro řádky
-    }
+      linesValue.fills = [{ fillType: "solid", fillColor: "#a6e3a1", fillOpacity: 1 }]; }
   }
 });
